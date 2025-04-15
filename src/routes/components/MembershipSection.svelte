@@ -6,7 +6,7 @@
 </script>
 
 <!-- Premium Membership Section -->
-<section class="bg-gradient-to-br from-gray-300 to-black px-8 py-24 text-white">
+<section class="bg-gradient-to-br px-8 py-24">
 	<div class="mx-auto max-w-screen-xl">
 		<!-- Section Header -->
 		<div class="mb-16 text-center">

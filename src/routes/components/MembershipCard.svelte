@@ -10,11 +10,13 @@
 <div
 	class=" bg-opacity-{popular
 		? '15'
-		: '10'} relative rounded-lg p-8 backdrop-blur-lg backdrop-filter transition-all duration-300 hover:-translate-y-2 hover:transform hover:shadow-xl"
+		: '10'} relative rounded-lg border-2 border-gray-300 p-8 shadow-xl backdrop-blur-lg backdrop-filter transition-all duration-300 hover:-translate-y-2 hover:transform"
 >
 	{#if popular}
 		<div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 transform">
-			<span class="rounded-full bg-white px-4 py-1 text-sm font-bold text-black">MOST POPULAR</span>
+			<span class="rounded-full border-2 bg-gray-300 px-4 py-1 text-sm font-bold text-black"
+				>MOST POPULAR</span
+			>
 		</div>
 	{/if}
 	<div class="mb-6 text-center">

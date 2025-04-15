@@ -23,7 +23,7 @@
 	];
 </script>
 
-<section class="bg-gray-100 px-8 py-16 text-black">
+<section class=" px-8 py-16">
 	<div class="mx-auto max-w-screen-xl">
 		<!-- Section Heading -->
 		<h2 class="mb-12 text-center text-4xl font-bold md:text-5xl">{heading}</h2>

@@ -9,7 +9,7 @@
 	export let buttonLink: string = '/signup';
 </script>
 
-<section class="bg-white px-8 py-16 text-black">
+<section class=" px-8 py-16">
 	<div class="mx-auto max-w-screen-xl">
 		<!-- Heading -->
 		<h2 class="mb-6 text-4xl font-bold md:text-5xl">{heading}</h2>
@@ -28,7 +28,7 @@
 		<div class="text-center">
 			<a
 				href={buttonLink}
-				class="inline-block bg-black px-8 py-3 font-medium text-white transition-colors hover:bg-gray-800"
+				class="inline-block bg-white px-8 py-3 font-medium text-black transition-colors hover:bg-gray-200"
 			>
 				{buttonText}
 			</a>

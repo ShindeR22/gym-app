@@ -4,7 +4,7 @@
 	export let description: string;
 </script>
 
-<div class="rounded-lg bg-white p-6 shadow-md">
+<div class="rounded-lg p-6 shadow-md">
 	<h3 class="mb-4 text-2xl font-bold">{title}</h3>
 	<p class="text-lg">
 		{description}
