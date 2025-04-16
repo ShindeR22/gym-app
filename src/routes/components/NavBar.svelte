@@ -4,8 +4,10 @@
 	import { signIn, signOut } from '@auth/sveltekit/client';
 	import { page } from '$app/stores';
 	import { SignIn, SignOut } from '@auth/sveltekit/components';
+	import OTPAuth from '$lib/OTPAuth.svelte'; // Import your OTP authentication component
 
 	let showDropdown = false;
+	let showOTP = false; // Toggle for showing OTP sign-in
 
 	const toggleDropdown = () => {
 		showDropdown = !showDropdown;
@@ -13,6 +15,11 @@
 
 	const closeDropdown = () => {
 		showDropdown = false;
+	};
+
+	// New toggle for OTP component
+	const toggleOTP = () => {
+		showOTP = !showOTP;
 	};
 
 	const handleClickOutside = (event: MouseEvent) => {
@@ -36,6 +43,12 @@
 			goto(`/user-${encodeURIComponent(userEmail)}`);
 		}
 	};
+
+	// Callback after successful OTP authentication.
+	const handleOTPSuccess = (user: any) => {
+		// For example, redirect to a protected page (or update your session)
+		goto('/dashboard');
+	};
 </script>
 
 <nav class="relative bg-gray-800 p-4 text-white">
@@ -46,6 +59,10 @@
 			<li><a href="/about" class="hover:underline">About</a></li>
 			<li><a href="/classes" class="hover:underline">Classes</a></li>
 			<li><a href="/contact" class="hover:underline">Contact</a></li>
+			<!-- New OTP Sign In button -->
+			<li>
+				<button on:click={toggleOTP} class="text-sm hover:underline"> OTP Sign In </button>
+			</li>
 
 			<!-- Profile Dropdown -->
 			<li class="relative" id="profileDropdown">
@@ -142,3 +159,16 @@
 		</ul>
 	</div>
 </nav>
+
+<!-- Conditionally show the OTP authentication component below the nav -->
+{#if showOTP}
+	<div class="container mx-auto my-4">
+		<OTPAuth onSuccess={handleOTPSuccess} />
+		<button
+			on:click={() => (showOTP = false)}
+			class="mt-2 rounded bg-gray-200 px-3 py-1 text-sm text-gray-800"
+		>
+			Close OTP Sign In
+		</button>
+	</div>
+{/if}
