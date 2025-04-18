@@ -4,10 +4,8 @@
 	import { signIn, signOut } from '@auth/sveltekit/client';
 	import { page } from '$app/stores';
 	import { SignIn, SignOut } from '@auth/sveltekit/components';
-	import OTPAuth from '$lib/OTPAuth.svelte'; // Import your OTP authentication component
 
 	let showDropdown = false;
-	let showOTP = false; // Toggle for showing OTP sign-in
 
 	const toggleDropdown = () => {
 		showDropdown = !showDropdown;
@@ -15,11 +13,6 @@
 
 	const closeDropdown = () => {
 		showDropdown = false;
-	};
-
-	// New toggle for OTP component
-	const toggleOTP = () => {
-		showOTP = !showOTP;
 	};
 
 	const handleClickOutside = (event: MouseEvent) => {
@@ -33,21 +26,18 @@
 		return () => window.removeEventListener('click', handleClickOutside);
 	});
 
-	// Derived reactive value for the user's email (if available)
+	// Reactive user email
 	$: userEmail = $page.data.session?.user?.email;
 
-	// Function to navigate to the profile page.
 	const handleProfileClick = () => {
 		if (userEmail) {
-			// It is recommended to encode the email in case it contains special characters
 			goto(`/user-${encodeURIComponent(userEmail)}`);
 		}
 	};
 
-	// Callback after successful OTP authentication.
-	const handleOTPSuccess = (user: any) => {
-		// For example, redirect to a protected page (or update your session)
-		goto('/dashboard');
+	// Navigate to /phone for phone sign‑in
+	const handlePhoneSignIn = () => {
+		goto('/phone');
 	};
 </script>
 
@@ -59,10 +49,6 @@
 			<li><a href="/about" class="hover:underline">About</a></li>
 			<li><a href="/classes" class="hover:underline">Classes</a></li>
 			<li><a href="/contact" class="hover:underline">Contact</a></li>
-			<!-- New OTP Sign In button -->
-			<li>
-				<button on:click={toggleOTP} class="text-sm hover:underline"> OTP Sign In </button>
-			</li>
 
 			<!-- Profile Dropdown -->
 			<li class="relative" id="profileDropdown">
@@ -72,7 +58,6 @@
 					aria-label="User menu"
 					title="User Menu"
 				>
-					<!-- Icon (or user image if logged in) -->
 					{#if $page.data.session?.user?.image}
 						<img
 							src={$page.data.session.user.image}
@@ -87,7 +72,6 @@
 							viewBox="0 0 24 24"
 							stroke="currentColor"
 							stroke-width="2"
-							aria-hidden="true"
 						>
 							<path
 								stroke-linecap="round"
@@ -98,7 +82,6 @@
 					{/if}
 				</button>
 
-				<!-- Dropdown Content -->
 				{#if showDropdown}
 					<div
 						class="ring-opacity-5 absolute right-0 z-10 mt-2 w-64 origin-top-right transform rounded-lg bg-white p-6 text-black shadow-xl ring-1 ring-black transition"
@@ -118,10 +101,9 @@
 								<p class="mb-4 text-center text-sm text-gray-500">
 									{$page.data.session.user?.email}
 								</p>
-								<!-- New "Profile" button -->
 								<button
 									on:click={handleProfileClick}
-									class="mb-4 w-full cursor-pointer rounded-lg bg-green-500 px-4 py-2 text-center text-sm font-medium text-white shadow transition duration-150 hover:bg-green-600 focus:ring-2 focus:ring-green-400 focus:ring-offset-2 focus:outline-none"
+									class="mb-4 w-full rounded-lg bg-green-500 px-4 py-2 text-center text-sm font-medium text-white shadow hover:bg-green-600 focus:ring-2 focus:ring-green-400 focus:outline-none"
 								>
 									Profile
 								</button>
@@ -130,7 +112,7 @@
 										slot="submitButton"
 										role="button"
 										tabindex="0"
-										class="w-full cursor-pointer rounded-lg bg-red-500 px-4 py-2 text-center text-sm font-medium text-white shadow transition duration-150 hover:bg-red-600 focus:ring-2 focus:ring-red-400 focus:ring-offset-2 focus:outline-none"
+										class="w-full rounded-lg bg-red-500 px-4 py-2 text-center text-sm font-medium text-white shadow hover:bg-red-600 focus:ring-2 focus:ring-red-400 focus:outline-none"
 									>
 										Sign Out
 									</div>
@@ -138,17 +120,20 @@
 							</div>
 						{:else}
 							<div class="flex flex-col items-center">
-								<p class="mb-4 text-center text-base font-medium text-gray-700">
-									You are not signed in
-								</p>
-								<SignIn>
+								<button
+									on:click={handlePhoneSignIn}
+									class="m-2 inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-base font-semibold text-white shadow hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+								>
+									Sign In with Phone
+								</button>
+								<SignIn provider="google">
 									<div
 										slot="submitButton"
 										role="button"
 										tabindex="0"
-										class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-base font-semibold text-white shadow transition duration-150 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
+										class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-base font-semibold text-white shadow hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"
 									>
-										Sign In
+										Sign In with Google
 									</div>
 								</SignIn>
 							</div>
@@ -159,16 +144,3 @@
 		</ul>
 	</div>
 </nav>
-
-<!-- Conditionally show the OTP authentication component below the nav -->
-{#if showOTP}
-	<div class="container mx-auto my-4">
-		<OTPAuth onSuccess={handleOTPSuccess} />
-		<button
-			on:click={() => (showOTP = false)}
-			class="mt-2 rounded bg-gray-200 px-3 py-1 text-sm text-gray-800"
-		>
-			Close OTP Sign In
-		</button>
-	</div>
-{/if}

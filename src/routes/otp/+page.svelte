@@ -1,5 +1,5 @@
 <script lang="ts">
-	import OTPAuth from '$lib/OTPAuth.svelte';
+	import OTPAuth from '../phone/+page.svelte';
 	import { goto } from '$app/navigation';
 
 	// Optionally, define a callback to run after successful OTP sign-in.
