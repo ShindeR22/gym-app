@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { goto } from '$app/navigation';
-	import { signIn, signOut } from '@auth/sveltekit/client';
+	import { goto, afterNavigate } from '$app/navigation';
+	import { signOut } from '@auth/sveltekit/client';
 	import { page } from '$app/stores';
 	import { SignIn, SignOut } from '@auth/sveltekit/components';
 
@@ -23,11 +23,12 @@
 
 	onMount(() => {
 		window.addEventListener('click', handleClickOutside);
+		afterNavigate(() => closeDropdown()); // Auto-close on navigation
 		return () => window.removeEventListener('click', handleClickOutside);
 	});
 
-	// Reactive user email
 	$: userEmail = $page.data.session?.user?.email;
+	$: userName = $page.data.session?.user?.name;
 
 	const handleProfileClick = () => {
 		if (userEmail) {
@@ -35,7 +36,6 @@
 		}
 	};
 
-	// Navigate to /phone for phone sign‑in
 	const handlePhoneSignIn = () => {
 		goto('/phone');
 	};
@@ -64,6 +64,12 @@
 							alt="User Profile"
 							class="h-8 w-8 rounded-full object-cover"
 						/>
+					{:else if userName}
+						<div
+							class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-sm font-bold text-white"
+						>
+							{userName.charAt(0).toUpperCase()}
+						</div>
 					{:else}
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
@@ -96,10 +102,10 @@
 									/>
 								{/if}
 								<p class="text-center text-lg font-bold text-gray-800">
-									{$page.data.session.user?.name ?? 'Anonymous User'}
+									{userName ?? 'Anonymous User'}
 								</p>
 								<p class="mb-4 text-center text-sm text-gray-500">
-									{$page.data.session.user?.email}
+									{userEmail}
 								</p>
 								<button
 									on:click={handleProfileClick}

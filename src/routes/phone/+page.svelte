@@ -3,14 +3,15 @@
 	import { onMount } from 'svelte';
 	import { auth } from '$lib/firebase/firebase';
 	import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
-	import { goto } from '$app/navigation'; // Import goto for navigation
+	import { goto } from '$app/navigation';
 
-	export let onSuccess: (user: any) => void; // Optional: callback if sign in succeeds.
-	let firstName: string = '';
-	let lastName: string = '';
-	let address: string = '';
-	let phone: string = '+91 ';
-	let otp: string = '';
+	export let onSuccess: (user: any) => void;
+
+	let firstName = '';
+	let lastName = '';
+	let address = '';
+	let phone = '+91 ';
+	let otp = '';
 	let confirmationResult: any = null;
 	let recaptchaVerifier: RecaptchaVerifier;
 	let isSendingOtp = false;
@@ -64,10 +65,32 @@
 			const result = await confirmationResult.confirm(otp);
 			console.log('OTP verified and user is signed in.');
 			console.log('User:', result.user);
-			if (onSuccess) {
-				onSuccess(result.user); // Call the onSuccess callback if provided
+
+			// 1) Build the payload
+			const payload = {
+				uid: result.user.uid,
+				phone: result.user.phoneNumber,
+				firstName,
+				lastName,
+				address
+			};
+
+			// 2) Send to your /api/users endpoint
+			const res = await fetch('/api/users', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(payload)
+			});
+
+			if (!res.ok) {
+				console.error('Failed to save user:', await res.text());
 			}
-			goto('/dashboard'); // Navigate to the dashboard page
+
+			// 3) Optional onSuccess callback
+			if (onSuccess) onSuccess(result.user);
+
+			// 4) Redirect
+			goto('/dashboard');
 		} catch (error) {
 			console.error('OTP verification failed:', error);
 			otpError = 'Invalid OTP. Please try again.';
@@ -84,8 +107,11 @@
 			<p class="text-gray-600">Login to your account</p>
 		</div>
 		<div id="recaptcha-container"></div>
+
+		<!-- Send OTP Form -->
 		<form on:submit={sendOtp} class="space-y-4">
 			<h2 class="text-center text-2xl font-bold">Login with Phone</h2>
+
 			<div>
 				<label for="firstName" class="block text-sm font-medium text-gray-700">First Name</label>
 				<input
@@ -97,6 +123,7 @@
 					class="mt-1 w-full rounded-md border px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
 				/>
 			</div>
+
 			<div>
 				<label for="lastName" class="block text-sm font-medium text-gray-700">Last Name</label>
 				<input
@@ -108,6 +135,7 @@
 					class="mt-1 w-full rounded-md border px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
 				/>
 			</div>
+
 			<div>
 				<label for="address" class="block text-sm font-medium text-gray-700"
 					>Address (optional)</label
@@ -120,6 +148,7 @@
 					class="mt-1 w-full rounded-md border px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
 				/>
 			</div>
+
 			<div>
 				<label for="phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
 				<input
@@ -134,6 +163,7 @@
 					<p class="mt-1 text-sm text-red-500">{phoneError}</p>
 				{/if}
 			</div>
+
 			<button
 				id="sign-in-button"
 				type="submit"
@@ -145,6 +175,8 @@
 				{isSendingOtp ? 'Sending...' : 'Send OTP'}
 			</button>
 		</form>
+
+		<!-- Verify OTP Form -->
 		{#if confirmationResult}
 			<p class="mb-4 text-center text-green-500">OTP sent successfully. Please check your phone.</p>
 			<form on:submit={verifyOtp} class="space-y-4">
